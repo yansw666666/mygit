@@ -1,0 +1,65 @@
+html,
+body,
+ul,
+li {
+  margin: 0px;
+  padding: 0px;
+}
+/* 初始化container宽度 */
+.container {
+  width: 1200px;
+  padding: 0px;
+}
+/* header区域 */
+.header {
+  background-color: rosybrown;
+}
+
+/*title*/
+.title {
+    background-color: #eee;
+    margin: 20px auto;
+    height: 40px;
+    line-height: 40px;
+    font-size:22px;
+    padding-left: 20px;
+    box-sizing: border-box;
+}
+
+/*图书概况*/
+.basic {
+    background-color: #eee;
+    margin: 20px auto;
+    height: 400px;
+    line-height: 40px;
+    font-size:22px;
+    padding-left: 20px;
+    box-sizing: border-box;
+
+}
+.basic div{
+    float:left;
+}
+.basic .left{
+    width:400px;
+    height: 400px;
+
+}
+.basic .right{
+    width:780px;
+    height: 400px;
+    background-color:lightblue;
+    padding: 20px 50px;
+    box-sizing: border-box;
+
+}
+/*图书详情*/
+.detail {
+    background-color: #eee;
+    margin: 20px auto;
+    height: 800px;
+    line-height: 40px;
+    font-size:22px;
+    padding-left: 20px;
+    box-sizing: border-box;
+}

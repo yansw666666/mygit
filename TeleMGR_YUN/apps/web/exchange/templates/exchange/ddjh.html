@@ -1,0 +1,420 @@
+{% extends 'layout/base_page.html' %}
+
+{% load static %}
+
+{% block title %}调度交换配线资料{% endblock %}
+
+{% block css %}{% endblock %}
+
+{% block content %}
+    <!--内容01：面包屑导航-->
+    <span class="layui-breadcrumb" >
+      <a href="" style="color: #0C0C0C">首页</a>
+      <a href="">交换系统</a>
+      <a style="color: #0C0C0C"><b>调度交换</b></a>
+    </span>
+
+    <!-- 内容02: 查询区域 --->
+    <div id="queryArea" style="margin-top: 30px;margin-bottom: 30px">
+        <form class="layui-form">
+            {% csrf_token %}
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="q_str"><b>查询条件：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="q_str" id="q_str" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button type="button" id="btnQuery" class="layui-btn" style="width: 100px"><i
+                            class="fa fa-search"></i>&nbsp;查询
+                    </button>
+                    <button type="button" id="btnAll" class="layui-btn" style="width: 100px"><i class="fa fa-list"></i>&nbsp;&nbsp;全部
+                    </button>
+                    <button type="button" id="btnAdd" class="layui-btn" style="width: 100px"><i
+                            class="fa fa-plus-circle"></i>&nbsp;&nbsp;添加
+                    </button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+    <!-- 内容03: 表格部分 -->
+    <table class="layui-hide" id="tableArea" lay-filter="tableArea" ></table>
+
+     <!-- 内容04：表格右侧的操作按钮 -->
+    <script type="text/html" id="tableButton">
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="lookup">
+            <i class="fa fa-search" aria-label="true"></i>查看
+        </a><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">
+            <i class="fa fa-edit" aria-label="true"></i>&nbsp;编辑
+        </a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+            <i class="fa fa-trash" aria-label="true"></i>&nbsp;删除
+        </a>
+
+    </script>
+
+    <!--=======弹出层的内容=========-->
+    <div id="layerContent" style="text-align:center;display:none;padding:30px 10px 0 30px">
+        <form class="layui-form" id="layerForm" lay-filter="layerForm">
+            {% csrf_token %}
+            <!-- 站点名称，电话号码，设备侧模块，设备侧线对，外线侧模块，外线侧线对，录音侧模块，录音侧线对，纽曼模块，纽曼线对
+                 飞跃模块，飞跃线对，安装时间，备注-->
+            <div class="layui-form-item" style="display: none">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="id" style="background-color: #eaeaea"><b>编号：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="id" id="id" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+
+            </div>
+            <!-- 站点名称，电话号码 -->
+            <div class="layui-form-item" >
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="station_name" style="background-color: #eaeaea"><b>站点名称：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="station_name" id="station_name" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="phone_number" style="background-color: #eaeaea"><b>电话号码：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="phone_number" id="phone_number" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 设备侧M，设备侧X -->
+            <div class="layui-form-item" >
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="sb_moduleid" style="background-color: #eaeaea"><b>设备侧MK：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="sb_moduleid" id="sb_moduleid" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="sb_modulepair" style="background-color: #eaeaea"><b>设备侧XD：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="sb_modulepair" id="sb_modulepair" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 外线侧M，外线侧X -->
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="wx_moduleid" style="background-color: #eaeaea"><b>外线侧MK：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="wx_moduleid" id="wx_moduleid" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="wx_modulepair" style="background-color: #eaeaea"><b>外线侧XD：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="wx_modulepair" id="wx_modulepair" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 录音侧M，录音侧X -->
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="rec_moduleid" style="background-color: #eaeaea"><b>录音侧MK：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="rec_moduleid" id="rec_moduleid" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="rec_modulepair" style="background-color: #eaeaea"><b>录音侧XD：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="rec_modulepair" id="rec_modulepair" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 纽曼侧M，纽曼侧X -->
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="nm_moduleid" style="background-color: #eaeaea"><b>纽曼侧MK：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="lnm_moduleid" id="nm_moduleid" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="nm_modulepair" style="background-color: #eaeaea"><b>纽曼侧XD：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="nm_modulepair" id="nm_modulepair" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 飞跃侧M，飞跃侧X -->
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="fy_moduleid" style="background-color: #eaeaea"><b>飞跃侧MK：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="fy_moduleid" id="fy_moduleid" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="fy_modulepair" style="background-color: #eaeaea"><b>飞跃侧XD：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="fy_modulepair" id="fy_modulepair" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 安装时间，备注-->
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="setup_time" style="background-color: #eaeaea"><b>安装时间：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="setup_time" id="setup_time" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="beizhu" style="background-color: #eaeaea"><b>备注：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="beizhu" id="beizhu" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+
+{% block js %}
+    <script>
+        var TAG=0
+     // === 入口函数 ===
+        $(function () {
+            // 页面初始化
+            initpage();
+            // 表格的初始化
+            initTable();
+        // 响应按钮的点击
+            buttonClick();
+        });
+
+        //页面的初始化
+        function initpage() {
+            layui.use(['element','form'],function () {
+                let element = layui.element;
+                let form = layui.form;
+            })
+            }
+
+        // ============ 初始化表格的功能实现 ================
+        function initTable() {
+            layui.use(['table', 'form', 'element'], function () {
+                let table = layui.table;
+                let form = layui.form;
+                let element = layui.element;
+
+                // ===渲染表格===
+                table.render({
+                    elem: $('#tableArea')
+                    , url: "{% url 'list_ddjh' %}"
+                    , method: 'post'
+                    ,toolbar:true
+                    , where: {
+                        // 携带输入的查询条件！
+                        q_str: $('#q_str').val().trim(),
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                    }
+                    , even: true
+                    , cols: [[
+                        {type: 'numbers', width: 60, title: '序号', align: 'center', sort: true}
+                        , {field: 'station_name',  title: '站点名称', align: 'center', sort: true}
+                        , {field: 'phone_number', title: '电话号码', align: 'center',}
+                        , {field: 'sb_moduleid', title: '设备侧模块', align: 'center',}
+                        , {field: 'sb_modulepair', title: '设备侧线对', align: 'center',}
+                        , {field: 'setup_date', title: '创建日期', align: 'center',}
+                        , {field: 'beizhu', title: '备注', align: 'center',}
+                        , {fixed: 'right', title: '操作', width:220, align: 'center', toolbar: '#tableButton'}
+                    ]]
+                    , page: true  // 启用分页，默认就向后台发送两个参数：page=1,limit=10
+                    , limit: 12
+                    , limits: [12, 15, 18, 20, 30, 50, 75, 100]
+                    , done: function (res, current, count) {
+                        $('thead tr').css({'background-color': '#009688', 'color': 'white'})
+                    }
+
+                });
+
+                // ===侦听表格的按钮点击===
+
+                table.on('tool(tableArea)', function (obj) {
+                    // 取出当前行数据
+
+                    let oneLineData = obj.data;
+                    console.log(oneLineData)
+                    // 响应按钮的点击事件
+                    if (obj.event === 'edit') {
+                        // 修改TAG值
+                        TAG = 2;
+                        // 加载弹出层
+                        loadLayer("编辑【配线信息】", oneLineData)
+                    } else if (obj.event === 'del') {
+                        delvalue(oneLineData);
+                    } else if (obj.event === 'lookup') {
+                        TAG = 3;
+                        loadLayer('查看【配线信息】', oneLineData);
+
+                    }
+                })
+            })
+
+        }
+
+        // ============ 实现按钮点击的事件的实现 =============
+        function buttonClick() {
+
+            // ==查询==
+            $('#btnQuery').on('click', function () {
+                // 重新加载table
+                initTable();
+
+            });
+
+            // ==显示全部==
+            $('#btnAll').on('click', function () {
+                // 清空查询数据，重新刷新表格
+                $('#q_str').val("");
+                initTable();
+
+            });
+
+            // ==添加==
+            $('#btnAdd').on('click', function () {
+                // 修改TAG 值
+                TAG = 1;
+                // 加载弹出层
+                loadLayer("添加【配线信息】",'');
+
+            });
+
+        }
+
+        // ===============配线信息添加和修改的弹出层 ==========
+        function loadLayer(title, value = "") {
+
+            // 使用layer
+            layui.use(['layer', 'form'], function () {
+                let layer = layui.layer;
+                let form = layui.form;
+
+                layer.open({
+                    type: 1
+                    , title: "<b style='color:navy'>" + title + "</b>"
+                    , area: ['710px', '550px']
+                    , offset: '100px'
+                    , btn: ['确定', '取消']
+                    , content: $('#layerContent')
+
+                    // ====== 三个回调函数====
+                    , success: function (index, layero) {
+                        //填充数据
+                        if (TAG === 2) {
+                            form.val('layerForm', value);
+                        }
+                        //响应查询按钮
+                        if(TAG===3){
+                            form.val('layerForm', value);
+                            $('#layerForm').find("input").attr('style', 'background-color: #eaeaea').prop('readonly', true);
+                        }
+                    }
+                    , yes: function (index, layero) {
+                        // 准备提交的URL
+
+                        let commitURL = "{% url 'add_ddjh' %}";
+
+                        // 判断是否为编辑
+                        if (TAG === 2) {
+                            commitURL = "{% url 'edit_ddjh' %}";
+                        }
+                        // 判断是否为查看
+                        if (TAG === 3){
+                            commitURL = "{% url 'list_ddjh' %}";
+                            layer.close(index)
+                        }
+
+                        // 使用Ajax提交
+                        $.ajax({
+                            url: commitURL
+                            , method: 'post'
+                            ,async:false
+                            , data: $('#layerForm').serialize()
+                            , dataType: 'json'
+                            , success: function (res) {
+                                // 判断
+                                if (res.status) {
+                                    layui.layer.msg("操作成功！");
+                                    layer.close(index);
+                                    initTable();
+                                } else {
+                                    layer.msg(res.error, {
+                                        icon: 2, area: ['300px', '150px'], time: -1, btn: ['关闭']
+                                    })
+                                }
+
+                            }
+
+                        })
+
+                    }
+                    , end: function (index, layero) {
+                        // 清除弹出层内容
+                         $('#layerForm').find("input").val("");
+                        // 调整只读的input
+                        $('#layerForm').find("input").attr('style', 'background-color: #FFF').prop('readonly', false);
+                    }
+                })
+
+            })
+
+        }
+        // ===============删除指定记录 ==========
+        function delvalue(value) {
+            let confirmStr='您确定要删除【'+value.station_name+'】账号信息吗？'
+            layer.confirm(confirmStr,{
+                icon:3,title:'删除确认',area:['400px','200px'],btn:['确定','取消']
+            },function(){
+                    $.ajax({
+                        url:'{% url 'delete_ddjh' %}'
+                        ,method:'post'
+                        ,data:{
+                            id:value.id,
+                            csrfmiddlewaretoken:'{{ csrf_token }}'
+                                }
+                        ,dataType:'Json'
+                        ,success:function(res){
+                            if (res.status) {
+                                location.reload();
+                                             }
+                            else {
+                                layer.msg(res.error, {
+                                 icon: 2, time: -1, area: ['400px', '200px'],time:-1, btn: ['关闭']
+                                });
+                                 }
+                                                }
+                        })
+                            })
+                                    }
+
+    </script>
+{% endblock %}

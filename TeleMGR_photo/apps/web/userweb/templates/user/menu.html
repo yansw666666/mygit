@@ -1,0 +1,279 @@
+{% extends 'layout/base_page.html' %}
+
+{% load static %}
+
+{% block title %}菜单管理{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+    <!--内容01=====面包屑=======-->
+    <span class="layui-breadcrumb" >
+      <a href="" style="color: #0C0C0C">首页</a>
+      <a href="">用户角色</a>
+      <a style="color: #0C0C0C"><b>菜单管理</b></a>
+    </span>
+    <!--内容02=====查询区域=======-->
+    <div class="queryArea" style="margin-top: 50px;">
+        <form class="layui-form">
+            {% csrf_token %}
+            <div class="layui-form-item">
+                <div class="layui-inline" style="width: 30%" >
+                    <label class="layui-form-label" for="q_str"><b>输入条件：</b></label>
+                    <div class="layui-input-block">
+                        <input type="text" name="q_str" id="q_str" class="layui-input" >
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button type="button" id="btnQuery" class="layui-btn">
+                        <i class="fa fa-search" aria-hidden="true"></i>&nbsp;查询</button>
+                    <button type="button" id="btnAll" class="layui-btn">
+                        <i class="fa fa-list" aria-hidden="true"></i>&nbsp; 全部</button>
+                    <button type="button" id="btnAdd" class="layui-btn" >
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp; 添加</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--内容03=====主体内容部分=======-->
+    <div id="contentArea" style="margin-top: 40px;margin-left: 10px">
+    </div>
+
+    <!--内容04=====菜单编辑器弹出框=======-->
+    <!-- 内容04： 弹出层 -->
+    <div id="layerArea" style="display: none; padding: 20px;">
+        <form class="layui-form" id="layerForm" lay-filter="layerForm">
+            {% csrf_token %}
+            <div class="layui-form-item">
+                <div class="layui-inline" style="display: none">
+                    <label class="layui-form-label" for="id"><b>编号：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" id="id" name="id" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="title"><b>菜单名称：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" id="title" name="title" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="icon"><b>菜单图标：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" id="icon" name="icon" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="order"><b>优先级：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" id="order" name="order" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+    let tag=0
+    $(function () {
+        initpage()
+        load_data()
+        buttonclick()
+
+        }
+    )
+
+    <!--初始化页面-->
+    function initpage() {
+        layui.use(['element','form'],function () {
+            let element=layui.element
+            let form=layui.form
+            }
+        )
+    }
+
+    function load_data() {
+        $.ajax({
+            url:'{% url 'list_menu' %}'
+            ,method:'post'
+            ,data:{
+                q_str:$('#q_str').val()
+                ,csrfmiddlewaretoken:'{{ csrf_token }}'
+            }
+            ,success:function (res) {
+                showinpage(res.data)
+            }
+        })
+    }
+
+    function showinpage(data) {
+        let targetContainer=$('#contentArea')
+        targetContainer.empty()
+        $.each(data,function (name,value) {
+           // 新建一个外层的集合
+                let child = $('<div>').attr('class', 'layui-col-xs6 layui-col-sm6 layui-col-md2 layui-col-lg2').css('margin-bottom', '20px');
+                // 新建一个子集集合
+                let childInner = $('<div>').attr('style', 'width: 80%;height: 200px;background-color:lightblue;border-radius: 10px;margin: auto;text-align: center;font-size:18px;').appendTo(child);
+                // 新建一个div
+                $('<div>').text(value.title).attr('name', value.id).attr('style', 'font-weight: bold;color:darkred;line-height:80px;').appendTo(childInner);
+                // 附加图标
+                $('<div>').html(value.icon).attr('style', 'line-height:40px;color:navy').appendTo(childInner);
+                // 附加优先级
+                $('<div>').html('优先级：'+value.order).attr('style', 'font-size:12px;line-height:40px;color:navy').appendTo(childInner);
+                // 附加
+                $('<i>').attr('id', 'btnEdit').attr('name', value.title).attr('code', value.id).attr("order", value.order).attr('class', 'fa fa-edit').attr('aria-hidden', true).appendTo(childInner);
+                $('<span>').html("&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp").appendTo(childInner);
+                $('<i>').attr('id', 'btnDel').attr('name', value.title).attr('code', value.id).attr("order", value.order).attr('class', 'fa fa-trash').attr('aria-hidden', true).appendTo(childInner);
+                // 附加到
+                child.appendTo(targetContainer);
+        })
+    }
+
+    function buttonclick() {
+
+        $('#btnQuery').on('click',function () {
+            load_data()
+        })
+
+        $('#btnAll').on('click',function () {
+            $('#q_str').val('')
+            load_data()
+        })
+
+        $('#btnAdd').on('click',function () {
+             loadlayer('添加菜单','')
+        })
+
+        $('body').on('click','#btnEdit',function () {
+            tag=2
+            let id=$(this).attr('code')
+            let title=$(this).attr('name')
+            let icon=$(this).prev().html()
+            let order=$(this).attr('order')
+            let data={'id':id,'title':title,'icon':icon,'order':order}
+            loadlayer('编辑菜单',data)
+
+        })
+
+        $('body').on('click','#btnDel',function () {
+            let id=$(this).attr('code')
+            let title=$(this).attr('name')
+            let confirmStr= '您是否确认删除菜单信息【'+title+'】?'
+            layui.use(['layer'],function () {
+                let layer=layui.layer
+                 layer.confirm(confirmStr, {icon: 3, title: "删除确认", area: ['400px', '200px']},
+                            function (index) {
+                 $.ajax({
+                        url:'{% url 'delete_menu' %}'
+                        ,method:'post'
+                        ,data: {
+                            id:id,
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                                }
+                        ,success:function(res){
+                            if (res.status){
+                                layer.msg('删除成功！')
+                                layer.close(index)
+                                load_data()
+                            }else{
+                                layer.msg(res.error,{
+                                    icon:2,
+                                    area:['500px','200px'],
+                                    time:-1,
+                                    btn:['取消']
+                                })
+                            }
+                        }
+                    })
+                            })
+            })
+        })
+
+    }
+
+    function loadlayer(title,value) {
+        layui.use(['layer','form'],function(){
+            let layer=layui.layer
+            let form=layui.form
+            //展示layer
+            layer.open({
+                type:'1'
+                ,title:"<b style='color: navy'>【"+title+"】</b>"
+                ,btn:['确定','取消']
+                ,area:['400px','400px']
+                ,content:$('#layerArea')
+                ,resize:false
+                ,success:function(){
+                    form.val('layerForm',value)
+                }
+
+                ,yes:function(index,layero){
+
+                    //清除错误提示
+                    $('.error_msg').empty()
+
+                    //对表单进行校验
+                    if($('#title').val().length===0){
+                        $('#title').next().html('菜单名称不能为空')
+                        return
+                    }
+                    if($('#icon ').val().length===0){
+                        $('#icon').next().html('图标不能为空')
+                        return
+                    }
+
+                    commiturl='{% url 'add_menu' %}'
+                    if(tag===2){
+                        commiturl='{% url 'edit_menu' %}'
+                    }
+
+                    //提交数据
+                    $.ajax({
+                        url:commiturl
+                        ,method:'post'
+                        ,data:$('#layerForm').serialize()
+                        ,success:function(res){
+                            if (res.status){
+                                layer.msg('操作成功！')
+                                layer.close(index)
+                                load_data()
+                            }else{
+                                layer.msg(res.error,{
+                                    icon:2,
+                                    area:['500px','200px'],
+                                    time:-1,
+                                    btn:['取消']
+                                })
+                            }
+                        }
+                    })
+                }
+                ,end:function(index,layero){
+                    form.val('layerForm',{
+                    title:'',
+                    icon:'',
+                    order:''
+                })
+                }
+
+            })
+            }
+        )
+
+    }
+
+
+
+</script>
+{% endblock %}

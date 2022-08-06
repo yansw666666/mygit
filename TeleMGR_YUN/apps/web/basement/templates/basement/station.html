@@ -1,0 +1,431 @@
+{% extends 'layout/base_page.html' %}
+
+{% load static %}
+
+{% block title %}通信站点维护{% endblock %}
+
+
+
+{% block css %}{% endblock %}
+
+{% block content %}
+    <!--内容01：面包屑导航-->
+    <span class="layui-breadcrumb" >
+      <a href="" style="color: #0C0C0C">首页</a>
+      <a href="">基础信息</a>
+      <a style="color: #0C0C0C"><b>站点维护</b></a>
+    </span>
+
+    <!-- 内容02: 查询区域 --->
+    <div id="queryArea" style="margin-top: 30px;margin-bottom: 30px">
+        <form class="layui-form">
+            {% csrf_token %}
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="q_str"><b>查询条件：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="q_str" id="q_str" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button type="button" id="btnQuery" class="layui-btn" style="width: 100px"><i
+                            class="fa fa-search"></i>&nbsp;查询
+                    </button>
+                    <button type="button" id="btnAll" class="layui-btn" style="width: 100px"><i class="fa fa-list"></i>&nbsp;&nbsp;全部
+                    </button>
+                    <button type="button" id="btnAdd" class="layui-btn" style="width: 100px"><i
+                            class="fa fa-plus-circle"></i>&nbsp;&nbsp;添加
+                    </button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+    <!-- 内容03: 表格部分 -->
+    <table class="layui-hide" id="tableArea" lay-filter="tableArea" ></table>
+
+     <!-- 内容04：表格右侧的操作按钮 -->
+    <script type="text/html" id="tableButton">
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="lookup">
+            <i class="fa fa-search" aria-label="true"></i>查看
+        </a><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">
+            <i class="fa fa-edit" aria-label="true"></i>&nbsp;编辑
+        </a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+            <i class="fa fa-trash" aria-label="true"></i>&nbsp;删除
+        </a>
+
+    </script>
+
+    <!--=======弹出层的内容=========-->
+    <div id="layerContent" style="display:none;padding:30px 10px 0 30px">
+        <form class="layui-form" id="layerForm" lay-filter="layerForm" style="margin-left:20px ">
+            {% csrf_token %}
+            <!-- 站点名称，站点级别，站点模式，所在辖区，投运时间-->
+
+            <!-- 站点名称 -->
+            <div class="layui-form-item" >
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="station_name" style="background-color: #eaeaea"><b>站点名称：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="station_name" id="station_name" class="layui-input" >
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 所在地区 -->
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="station_region" style="background-color: #eaeaea"><b>所在区域：</b></label>
+                    <div class="layui-input-inline">
+                        <div id="station_region" class="xm-select-demo" ></div>
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 站点等级 -->
+            <div class="layui-form-item">
+                    <label class="layui-form-label" for="station_level" style="background-color: #eaeaea"><b>站点等级：</b></label>
+                    <div class="layui-input-inline">
+                        <div id="station_level" class="xm-select-demo" ></div>
+                        <span class="error_msg" style="color: red; position: absolute"></span>
+                    </div>
+                </div>
+            <!-- 管理模式 -->
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="station_mode" style="background-color: #eaeaea"><b>管理模式：</b></label>
+                    <div class="layui-input-inline">
+                        <div id="station_mode" class="xm-select-demo" ></div>
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 投运时间 -->
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="build_date" style="background-color: #eaeaea"><b>投运日期：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="build_date" id="build_date" class="layui-input" >
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+
+
+
+{% block js %}
+    <!-- 引入 xm-select的JS文件 -->
+<script src="{% static 'js/xm-select.js' %}"></script>
+    <script>
+        var TAG=0
+     // === 入口函数 ===
+        $(function () {
+            // 页面初始化
+            initpage();
+            // 表格的初始化
+            initTable(1);
+        // 响应按钮的点击
+            buttonClick();
+        });
+
+        //页面的初始化
+        function initpage() {
+            layui.use(['element','form'],function () {
+                let element = layui.element;
+                let form = layui.form;
+            })
+            }
+
+        // ============ 初始化表格的功能实现 ================
+        function initTable(value) {
+            layui.use(['table', 'form', 'element'], function () {
+                let table = layui.table;
+                let form = layui.form;
+                let element = layui.element;
+
+                // ===渲染表格===
+                table.render({
+                    elem: $('#tableArea')
+                    , url: "{% url 'list_station' %}"
+                    , method: 'post'
+                    ,toolbar:true
+                    , where: {
+                        // 携带输入的查询条件！
+                        init:value,
+                        q_str: $('#q_str').val().trim(),
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                    }
+                    , even: true
+                    /*
+                    ====================方法一：原生SQL语句===============
+                    , cols: [[
+                        {type: 'numbers', width: 60, title: '序号', align: 'center', sort: true}
+                        , {field: 'station_name',  title: '通信站点', align: 'center', sort: true}
+                        , {field: 'model_name', title: '管理模式', align: 'center',}
+                        , {field: 'region_name', title: '所在位置', align: 'center',}
+                        , {field: 'level_name', title: '站点等级', align: 'center',}
+                        , {field: 'build_date', title: '投运时间', align: 'center',}
+                        , {fixed: 'right', title: '操作', width:220, align: 'center', toolbar: '#tableButton'}
+                    ]]*/
+                    //====================方法一：原生SQL语句===============
+                    , cols: [[
+                        {type: 'numbers', width: 60, title: '序号', align: 'center', sort: true}
+                        , {field: 'station_name',  title: '通信站点', align: 'center', sort: true}
+                        , {field: 'model_name', title: '管理模式', align: 'center',}
+                        , {field: 'region_name', title: '所在位置', align: 'center',}
+                        , {field: 'level_name', title: '站点等级', align: 'center',}
+                        , {field: 'build_date', title: '投运时间', align: 'center',}
+                        , {fixed: 'right', title: '操作', width:220, align: 'center', toolbar: '#tableButton'}
+                    ]]
+                    , page: true  // 启用分页，默认就向后台发送两个参数：page=1,limit=10
+                    , limit: 10
+                    , limits: [10, 15, 18, 20, 30, 50, 75, 100]
+                    , done: function (res, current, count) {
+                        $('thead tr').css({'background-color': '#009688', 'color': 'white'})
+                    }
+                });
+
+                // ===侦听表格的按钮点击===
+
+                table.on('tool(tableArea)', function (obj) {
+                    // 取出当前行数据
+                    let oneLineData = obj.data;
+                    // 响应按钮的点击事件
+                    if (obj.event === 'edit') {
+                        // 修改TAG值
+                        TAG = 2;
+                        // 加载弹出层
+                        loadLayer("编辑【通信站点】", oneLineData)
+                    } else if (obj.event === 'del') {
+                        delvalue(oneLineData);
+                    } else if (obj.event === 'lookup') {
+                        TAG = 3;
+                        loadLayer('查看【通信站点】', oneLineData);
+
+                    }
+                })
+            })
+
+        }
+
+        // ============ 实现按钮点击的事件的实现 =============
+        function buttonClick() {
+
+            // ==查询==
+            $('#btnQuery').on('click', function () {
+                // 重新加载table
+                initTable(2);
+
+            });
+
+            // ==显示全部==
+            $('#btnAll').on('click', function () {
+                // 清空查询数据，重新刷新表格
+                $('#q_str').val("");
+                initTable();
+
+            });
+
+            // ==添加==
+            $('#btnAdd').on('click', function () {
+                // 修改TAG 值
+                TAG = 1;
+                // 加载弹出层
+                loadLayer("添加【通信站点】",'');
+
+            });
+
+        }
+
+         // ==============渲染下拉选择框 ==========
+        function render_select() {
+            // 初始化
+            let level_select = xmSelect.render({
+                    el: '#station_level'
+                    ,name: 'station_level'
+                    ,tips:'请选择站点等级'
+                    ,radio:true
+                    ,filterable:true
+                    ,height:'150px'
+                    ,data: [
+                        {name: '220Kv站点', value: 1},
+                        {name: '110Kv站点', value:2},
+                        {name: '35Kv站点', value: 3},
+                        {name: '通信枢纽站', value:4},
+                        {name: '综合通信站', value: 5},
+                    ]
+                })
+
+            let mode_select = xmSelect.render({
+                    el: '#station_mode'
+                    ,name: 'station_mode'
+                    ,tips:'请选择站点模式'
+                    ,radio:true
+                    ,filterable:true
+                    ,height:'100px'
+                    ,data: [
+                        {name: '一体化机房', value:1},
+                        {name: '独立机房', value:2},
+
+                    ]
+                })
+
+            let region_select = xmSelect.render({
+                    el: '#station_region'
+                    ,name: 'station_region'
+                    ,tips:'请选择所属区域'
+                    ,radio:true
+                    ,filterable:true
+                    ,height:'150px'
+                    ,data: [
+                        {name: '东宝区', value:1},
+                        {name: '高新区', value: 2},
+                        {name: '钟祥市', value: 3},
+                        {name: '京山市', value: 4},
+                        {name: '沙洋县', value:5},
+                    ]
+                })
+
+        }
+
+        // ===============添加和修改的弹出层 ==========
+        function loadLayer(title, value = "") {
+
+            // 使用layer
+            layui.use(['layer', 'form'], function () {
+                let layer = layui.layer;
+                let form = layui.form;
+
+
+                layer.open({
+                    type: 1
+                    , title: "<b style='color:navy'>" + title + "</b>"
+                    , area: ['400px', '450px']
+                    , btn: ['确定', '取消']
+                    , content: $('#layerContent')
+
+                    // ====== 三个回调函数====
+                    , success: function (index, layero) {
+                        //填充数据
+                         render_select()
+                        if (TAG === 2) {
+                            form.val('layerForm', value);
+                            // == 赋值xmselect ====
+                            // 获取xmselect对象
+                            xmSelect.get('#station_level')[0].setValue([{'name': value['level_name'], 'value':value['level_id']}])
+                            xmSelect.get('#station_region')[0].setValue([{'name': value['region_name'], 'value':value['region_id']}])
+                            xmSelect.get('#station_mode')[0].setValue([{'name': value['model_name'], 'value':value['model_id']}])
+                            $('#layerForm').find("input").attr('style', 'background-color: #fff').prop('readonly', false);
+                            xmSelect.get('#station_level')[0].update({disabled:false})
+                            xmSelect.get('#station_region')[0].update({disabled:false})
+                            xmSelect.get('#station_mode')[0].update({disabled:false})
+
+
+                        }
+                        //响应查询按钮
+                        if(TAG===3){
+                            form.val('layerForm', value);
+                            console.log(value['model_id'],value['model_name'])
+                            // == 赋值xmselect ====
+                            // 获取xmselect对象
+                            xmSelect.get('#station_level')[0].setValue([{'name': value['level_name'], 'value':value['level_id']}])
+                            xmSelect.get('#station_region')[0].setValue([{'name': value['region_name'], 'value':value['region_id']}])
+                            xmSelect.get('#station_mode')[0].setValue([{'name': value['model_name'], 'value':value['model_id']}])
+                            $('#layerForm').find("input").attr('style', 'background-color: #eaeaea').prop('readonly', true);
+                            xmSelect.get('#station_level')[0].update({disabled:true})
+                            xmSelect.get('#station_region')[0].update({disabled:true})
+                            xmSelect.get('#station_mode')[0].update({disabled:true})
+                        }
+
+                        //初始化角色的下拉框
+
+                    }
+                    , yes: function (index, layero) {
+                        // 准备提交的URL
+
+                        let commitURL = "{% url 'add_station' %}";
+
+                        // 判断是否为编辑
+                        if (TAG === 2) {
+                            commitURL = "{% url 'edit_station' %}";
+                        }
+                        // 判断是否为查看
+                        if (TAG === 3){
+                            commitURL = "{% url 'list_station' %}";
+                            layer.close(index)
+                        }
+
+                        // 使用Ajax提交
+                        $.ajax({
+                            url: commitURL
+                            , method: 'post'
+                            ,async:false
+                            , data: $('#layerForm').serialize()
+                            , dataType: 'json'
+                            , success: function (res) {
+                                // 判断
+                                if (res.status) {
+                                    layui.layer.msg("操作成功！");
+                                    layer.close(index);
+                                    initTable();
+                                } else {
+                                    layer.msg(res.error, {
+                                        icon: 2, area: ['300px', '150px'], time: -1, btn: ['关闭']
+                                    })
+                                }
+
+                            }
+
+                        })
+
+                    }
+                    , end: function (index, layero) {
+                        // 清除弹出层内容
+                         $('#layerForm').find("input").val("");
+                        // 调整只读的input
+                        $('#layerForm').find("input").attr('style', 'background-color: #FFF').prop('readonly', false);
+                    }
+                })
+
+            })
+
+        }
+        // ===============删除指定记录 ==========
+        function delvalue(value) {
+            let confirmStr='您确定要删除【'+value.station_name+'】站点信息吗？'
+            layer.confirm(confirmStr,{
+                icon:3,title:'删除确认',area:['400px','200px'],btn:['确定','取消']
+            },function(){
+                    $.ajax({
+                        url:'{% url 'delete_station' %}'
+                        ,method:'post'
+                        ,data:{
+                            station_name:value.station_name,
+                            csrfmiddlewaretoken:'{{ csrf_token }}'
+                                }
+                        ,dataType:'Json'
+                        ,success:function(res){
+                            if (res.status) {
+                                location.reload();
+                                             }
+                            else {
+                                layer.msg(res.error, {
+                                 icon: 2, time: -1, area: ['400px', '200px'],time:-1, btn: ['关闭']
+                                });
+                                 }
+                                                }
+                        })
+                            })
+                                    }
+
+
+    </script>
+{% endblock %}

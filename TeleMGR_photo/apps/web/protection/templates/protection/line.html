@@ -1,0 +1,417 @@
+{% extends 'layout/base_page.html' %}
+
+{% load static %}
+
+{% block title %}保护业务-光缆{% endblock %}
+
+{% block css %}{% endblock %}
+
+{% block content %}
+    <!--内容01：面包屑导航-->
+    <span class="layui-breadcrumb" >
+      <a href="" style="color: #0C0C0C">首页</a>
+      <a href="">保护稳控</a>
+      <a style="color: #0C0C0C"><b>承载光缆</b></a>
+    </span>
+
+    <!-- 内容02: 查询区域 --->
+    <div id="queryArea" style="margin-top: 30px;margin-bottom: 30px">
+        <form class="layui-form">
+            {% csrf_token %}
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="q_str"><b>查询条件：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="q_str" id="q_str" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button type="button" id="btnQuery" class="layui-btn" style="width: 100px"><i
+                            class="fa fa-search"></i>&nbsp;查询
+                    </button>
+                    <button type="button" id="btnAll" class="layui-btn" style="width: 100px"><i class="fa fa-list"></i>&nbsp;&nbsp;全部
+                    </button>
+                    <button type="button" id="btnAdd" class="layui-btn" style="width: 100px"><i
+                            class="fa fa-plus-circle"></i>&nbsp;&nbsp;添加
+                    </button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+    <!-- 内容03: 表格部分 -->
+    <table class="layui-hide" id="tableArea" lay-filter="tableArea" ></table>
+
+     <!-- 内容04：表格右侧的操作按钮 -->
+    <script type="text/html" id="tableButton">
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="lookup">
+            <i class="fa fa-search" aria-label="true"></i>查看
+        </a><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">
+            <i class="fa fa-edit" aria-label="true"></i>&nbsp;编辑
+        </a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+            <i class="fa fa-trash" aria-label="true"></i>&nbsp;删除
+        </a>
+
+    </script>
+
+    <!--=======弹出层的内容=========-->
+    <div id="layerContent" style="display:none;padding:30px 10px 0 30px">
+        <form class="layui-form" id="layerForm" lay-filter="layerForm">
+            {% csrf_token %}
+            <!-- 线路名称，起止站点，调度关系，运维单位，业务类型，装置型号，接口类型，通道类型，路由明细，传输系统
+                 途经光缆，方式单号，备注-->
+            <div class="layui-form-item" style="display: none">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="id" style="background-color: #eaeaea"><b>编号：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="id" id="id" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 线路名称，起止站点 -->
+            <div class="layui-form-item" >
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="line_name" style="background-color: #eaeaea"><b>线路名称：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="line_name" id="line_name" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="start_end" style="background-color: #eaeaea"><b>起止站点：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="start_end" id="start_end" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 调度关系，运维单位 -->
+            <div class="layui-form-item" >
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="diaodu_rel" style="background-color: #eaeaea"><b>调度关系：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="diaodu_rel" id="diaodu_rel" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="yunwei_dep" style="background-color: #eaeaea"><b>运维单位：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="yunwei_dep" id="yunwei_dep" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 业务类型，装置型号 -->
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="service_type" style="background-color: #eaeaea"><b>业务类型：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="service_type" id="service_type" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="terminal_type" style="background-color: #eaeaea"><b>装置型号：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="terminal_type" id="terminal_type" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 接口类型，通道类型 -->
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="interface_type" style="background-color: #eaeaea"><b>接口类型：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="interface_type" id="interface_type" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="channel_type" style="background-color: #eaeaea"><b>通道类型：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="channel_type" id="channel_type" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 路由明细方式单号，传输系统 -->
+            <div class="layui-form-item">
+
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="trans_sys" style="background-color: #eaeaea"><b>传输系统：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="trans_sys" id="trans_sys" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="method_page" style="background-color: #eaeaea"><b>方式单号：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="method_page" id="method_page" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 路由明细-->
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="route_detail" style="background-color: #eaeaea"><b>路由明细：</b></label>
+                    <div class="layui-input-inline" style="width: 512px">
+                        <textarea name="route_detail" id="route_detail" required lay-verify="required"  class="layui-textarea"></textarea>
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 途经光缆 -->
+            <div class="layui-form-item" >
+                <div class="layui-inline" >
+                    <label class="layui-form-label" for="guanglan_inroad" style="background-color: #eaeaea"><b>途经光缆：</b></label>
+                    <div class="layui-input-inline" style="width: 512px">
+                        <input type="text" name="guanglan_inroad" id="guanglan_inroad" class="layui-input" >
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 备注-->
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="beizhu" style="background-color: #eaeaea"><b>备注：</b></label>
+                    <div class="layui-input-inline" style="width: 512px">
+                        <input type="text" name="beizhu" id="beizhu" class="layui-input">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+
+{% block js %}
+    <script>
+        var TAG=0
+     // === 入口函数 ===
+        $(function () {
+            // 页面初始化
+            initpage();
+            // 表格的初始化
+            initTable();
+        // 响应按钮的点击
+            buttonClick();
+        });
+
+        //页面的初始化
+        function initpage() {
+            layui.use(['element','form'],function () {
+                let element = layui.element;
+                let form = layui.form;
+            })
+            }
+
+        // ============ 初始化表格的功能实现 ================
+        function initTable() {
+            layui.use(['table', 'form', 'element'], function () {
+                let table = layui.table;
+                let form = layui.form;
+                let element = layui.element;
+
+                // ===渲染表格===
+                table.render({
+                    elem: $('#tableArea')
+                    , url: "{% url 'list_line' %}"
+                    , method: 'post'
+                    ,toolbar:true
+                    , where: {
+                        // 携带输入的查询条件！
+                        q_str: $('#q_str').val().trim(),
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                    }
+                    , even: true
+                    , cols: [[
+                        {type: 'numbers', width: 60, title: '序号', align: 'center', sort: true}
+                        , {field: 'line_name',  title: '线路名称', align: 'center', sort: true}
+                        , {field: 'start_end', title: '起止站点', align: 'center',}
+                        , {field: 'terminal_type', title: '装置型号', align: 'center',}
+                        , {field: 'interface_type', title: '接口类型', align: 'center',}
+                        , {field: 'channel_type', title: '通道类型', align: 'center',}
+                        , {field: 'route_detail', title: '路由明细', align: 'center',}
+                        , {field: 'guanglan_inroad', title: '途经光缆', align: 'center',}
+                        , {field: 'trans_sys', title: '传输系统', align: 'center',}
+                        , {fixed: 'right', title: '操作', width:220, align: 'center', toolbar: '#tableButton'}
+                    ]]
+                    , page: true  // 启用分页，默认就向后台发送两个参数：page=1,limit=10
+                    , limit: 10
+                    , limits: [10, 15, 18, 20, 30, 50, 75, 100]
+                    , done: function (res, current, count) {
+                        $('thead tr').css({'background-color': '#009688', 'color': 'white'})
+                    }
+                });
+
+                // ===侦听表格的按钮点击===
+
+                table.on('tool(tableArea)', function (obj) {
+                    // 取出当前行数据
+                    let oneLineData = obj.data;
+                    // 响应按钮的点击事件
+                    if (obj.event === 'edit') {
+                        // 修改TAG值
+                        TAG = 2;
+                        // 加载弹出层
+                        loadLayer("编辑【保护业务信息】", oneLineData)
+                    } else if (obj.event === 'del') {
+                        delvalue(oneLineData);
+                    } else if (obj.event === 'lookup') {
+                        TAG = 3;
+                        loadLayer('查看【保护业务信息】', oneLineData);
+
+                    }
+                })
+            })
+
+        }
+
+        // ============ 实现按钮点击的事件的实现 =============
+        function buttonClick() {
+
+            // ==查询==
+            $('#btnQuery').on('click', function () {
+                // 重新加载table
+                initTable();
+
+            });
+
+            // ==显示全部==
+            $('#btnAll').on('click', function () {
+                // 清空查询数据，重新刷新表格
+                $('#q_str').val("");
+                initTable();
+
+            });
+
+            // ==添加==
+            $('#btnAdd').on('click', function () {
+                // 修改TAG 值
+                TAG = 1;
+                // 加载弹出层
+                loadLayer("添加【保护业务信息】",'');
+
+            });
+
+        }
+
+        // ===============添加和修改的弹出层 ==========
+        function loadLayer(title, value = "") {
+
+            // 使用layer
+            layui.use(['layer', 'form'], function () {
+                let layer = layui.layer;
+                let form = layui.form;
+
+                layer.open({
+                    type: 1
+                    , title: "<b style='color:navy'>" + title + "</b>"
+                    , area: ['710px', '650px']
+                    , btn: ['确定', '取消']
+                    , content: $('#layerContent')
+
+                    // ====== 三个回调函数====
+                    , success: function (index, layero) {
+                        //填充数据
+                        if (TAG === 2) {
+                            form.val('layerForm', value);
+                        }
+                        //响应查询按钮
+                        if(TAG===3){
+                            form.val('layerForm', value);
+                            $('#layerForm').find("input").attr('style', 'background-color: #eaeaea').prop('readonly', true);
+                            $("#route_detail").attr('style', 'background-color: #eaeaea').prop('readonly', true);
+                        }
+                    }
+                    , yes: function (index, layero) {
+                        // 准备提交的URL
+
+                        let commitURL = "{% url 'add_line' %}";
+
+                        // 判断是否为编辑
+                        if (TAG === 2) {
+                            commitURL = "{% url 'edit_line' %}";
+                        }
+                        // 判断是否为查看
+                        if (TAG === 3){
+                            commitURL = "{% url 'list_line' %}";
+                            layer.close(index)
+                        }
+
+                        // 使用Ajax提交
+                        $.ajax({
+                            url: commitURL
+                            , method: 'post'
+                            ,async:false
+                            , data: $('#layerForm').serialize()
+                            , dataType: 'json'
+                            , success: function (res) {
+                                // 判断
+                                if (res.status) {
+                                    layui.layer.msg("操作成功！");
+                                    layer.close(index);
+                                    initTable();
+                                } else {
+                                    layer.msg(res.error, {
+                                        icon: 2, area: ['300px', '150px'], time: -1, btn: ['关闭']
+                                    })
+                                }
+
+                            }
+
+                        })
+
+                    }
+                    , end: function (index, layero) {
+                        // 清除弹出层内容
+                         $('#layerForm').find("input").val("");
+                         $("#route_detail").val('');
+                        // 调整只读的input
+                        $('#layerForm').find("input").attr('style', 'background-color: #FFF').prop('readonly', false);
+                        $("#route_detail").attr('style', 'background-color: #FFF').prop('readonly', false);
+                    }
+                })
+
+            })
+
+        }
+        // ===============删除指定记录 ==========
+        function delvalue(value) {
+            let confirmStr='您确定要删除【'+value.line_name+'】保护信息吗？'
+            layer.confirm(confirmStr,{
+                icon:3,title:'删除确认',area:['400px','200px'],btn:['确定','取消']
+            },function(){
+                    $.ajax({
+                        url:'{% url 'delete_line' %}'
+                        ,method:'post'
+                        ,data:{
+                            id:value.id,
+                            csrfmiddlewaretoken:'{{ csrf_token }}'
+                                }
+                        ,dataType:'Json'
+                        ,success:function(res){
+                            if (res.status) {
+                                location.reload();
+                                             }
+                            else {
+                                layer.msg(res.error, {
+                                 icon: 2, time: -1, area: ['400px', '200px'],time:-1, btn: ['关闭']
+                                });
+                                 }
+                                                }
+                        })
+                            })
+                                    }
+
+    </script>
+{% endblock %}

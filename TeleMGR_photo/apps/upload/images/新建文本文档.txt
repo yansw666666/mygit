@@ -1,0 +1,36 @@
+
+
+关于连接查询，存在一个疑问，求解：
+
+例子：
+
+   表1：站点表station                                               表2：  地区表city
+           	 id      name    region-id （外键）                                id      region
+            	1       草场变    1                                                         1        东宝区
+            	2       马良变    1                                                         2	      掇刀区
+	3      兴隆变     2
+
+要求：查出东宝区的站点有哪几个？      
+	objs =station.objects.filter(region__region__exact='东宝区').values
+           显示结果有2条:
+	草场变，马良变
+                 【
+	{id:1,name:草场变,region_id:1}
+	{id:1,name:马良变,region_id:1}
+	】
+问题：我希望把查询结果的取值，不是region_id：1，而是region:东宝区。
+           请问：取值时，能不能把主键表的值取出来？怎么做？
+           求解！！
+
+select station_name,model_name,level_name,region_name,build_date,station_level_id, station_model_id, station_region_id 
+from tele_station,station_region,station_level,station_model 
+where tele_station.station_level_id = station_level.id 
+and tele_station.station_region_id = station_region.id 
+and tele_station.station_model_id = station_model.id
+and tele_station.station_name=220Kv丽山变
+or station_model.model_name=220Kv丽山变
+or station_level.level_name=220Kv丽山变
+
+
+{'status': False, 'conn': <pymysql.connections.Connection object at 0x000002BB303B6F88>, 'error': '获取数据库数据出现异常！具体原因：(1054, "Unknown column \'tele_region.re
+gion_name\' in \'where clause\'")'}

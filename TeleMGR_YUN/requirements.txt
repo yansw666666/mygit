@@ -1,0 +1,15 @@
+asgiref==3.5.2
+certifi @ file:///C:/Windows/TEMP/abs_e9b7158a-aa56-4a5b-87b6-c00d295b01fanefpc8_o/croots/recipe/certifi_1655968940823/work/certifi
+cffi==1.15.1
+cryptography==37.0.4
+Django==3.2.14
+django-stdimage==3.2.0
+Pillow==9.2.0
+progressbar2==4.0.0
+pycparser==2.21
+PyMySQL==1.0.2
+python-utils==3.3.3
+pytz==2022.1
+sqlparse==0.4.2
+typing_extensions==4.3.0
+wincertstore==0.2

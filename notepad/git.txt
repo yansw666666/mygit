@@ -17,3 +17,7 @@ git reset --hard HEAD~50
 git reset --hard 版本号
 git reflog记录了先前所有的版本号
 cat readme打开一个文件
+
+添加远程仓库github
+代码托管
+github.com

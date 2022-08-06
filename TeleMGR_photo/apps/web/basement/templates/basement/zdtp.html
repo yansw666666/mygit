@@ -1,0 +1,128 @@
+{% extends 'layout/base_page.html' %}
+
+{% load static %}
+
+{% block title %}现场图片查询{% endblock %}
+
+<!-- 引入font-awesome 的CSS文件 -->
+    <link rel="stylesheet" href="{% static 'plugin/font-awesome/css/font-awesome.min.css' %}">
+
+{% block css %}{% endblock %}
+
+{% block content %}
+    <!--内容01：面包屑导航-->
+    <span class="layui-breadcrumb" >
+      <a href="" style="color: #0C0C0C">首页</a>
+      <a href="">图片资料</a>
+      <a style="color: #0C0C0C"><b>通信设备图片</b></a>
+    </span>
+
+    <div class="layui-form-item">
+         <img src="{% static 'images/jmxt.jpg' %}" style="padding:20px 0 0 20px;width: 200px;height: 70px">
+    </div>
+    <!-- 内容02: 查询区域 --->
+    <div id="queryArea" style="margin-top: 30px;margin-bottom: 30px">
+        <form class="layui-form">
+            {% csrf_token %}
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="q_str"><b>站点名称：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="q_str" id="q_str" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="shebei_type"><b>设备类型：</b></label>
+                    <div class="layui-input-inline">
+                        <div id="shebei_type" class="xm-select-demo" style="width: 250px"></div>
+                    </div>
+                </div>
+                <div class="layui-inline" style="margin-left: 50px">
+                    <button type="button" id="btnQuery" class="layui-btn" style="width: 100px"><i
+                            class="fa fa-search"></i>&nbsp;查询
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="container books" style="height: 500px;margin:20px auto;background-color: #eaeaea">
+          <!-- Ajax动态加载 -->
+    </div>
+
+{% endblock %}
+{% block js %} <script src="{% static 'js/xm-select.js' %}"></script>
+    <script>
+        $(function(){
+            initpage()
+            render_select()
+        })
+
+        //页面的初始化
+        function initpage() {
+            layui.use(['element','form'],function () {
+                let element = layui.element;
+                let form = layui.form;
+            })
+            }
+
+
+        // ==============渲染下拉选择框 ==========
+            function render_select() {
+                // 初始化
+                let demo5 = xmSelect.render({
+                    el: '#shebei_type',
+                    filterable: true,
+                    height: '500px',
+                    tips:'选择设备类型',
+                    paging: true,
+                    pageSize: 8,
+                    data: [
+                        {name: '配线资料', children: [
+                            {name: '音频配线架', value: 1},
+                            {name: '数字配线架', value: 2},
+                            {name: '光纤配线架', value: 3},
+                        ]},
+                        {name: '传输设备', children: [
+                            {name: '华为传输', value: 4},
+                            {name: '中兴传输', value: 5},
+                            {name: '烽火传输', value: 6},
+                            {name: 'OTN传输', value: 6},
+                        ]},
+                        {name: '电源系统', children: [
+                            {name: '交流分配屏', value: 4},
+                            {name: '直流分配屏', value: 5},
+                            {name: '高频开关电源', value: 6},
+                            {name: '蓄电池组', value: 6},
+                            {name: 'UPS电源', value: 6},
+                        ]},
+                        {name: '终端设备', children: [
+                            {name: '视频终端', value: 4},
+                            {name: '音频终端', value: 5},
+                            {name: 'PCM终端', value: 6},
+                            {name: 'IAD设备', value: 6},
+                        ]},
+                        {name: '交换设备', children: [
+                            {name: '调度交换', value: 4},
+                            {name: '行政交换', value: 5},
+                            {name: '录音设备', value: 6},
+                        ]},
+                        {name: '监控设备', children: [
+                            {name: '动环监控', value: 4},
+                            {name: '网管设备', value: 5},
+                        ]},
+                        {name: '空调系统', children: [
+                            {name: '工业空调', value: 4},
+                            {name: '普通空调', value: 5},
+                        ]},
+                    ]
+                })
+            }
+    </script>
+{% endblock %}
+
+
+
+
+
+

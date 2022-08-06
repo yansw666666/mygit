@@ -1,0 +1,51 @@
+html,
+body,
+ul,
+li {
+  margin: 0px;
+  padding: 0px;
+}
+
+/* 初始化container宽度 */
+.container {
+  width: 1200px;
+  padding: 0px;
+}
+/* header区域 */
+.header {
+  background-color: darkslategrey;
+}
+
+/* 类别筛选区域 */
+.typefilter {
+  background-color: #eee;
+  margin: 20px auto;
+  font-size: 16px;
+  line-height: 26px;
+  padding: 10px 0px;
+}
+.typefilter .row :first-child {
+  text-align: right;
+  font-weight: bold;
+}
+.typefilter .row :last-child {
+  font-size: 12px;
+}
+
+/*其他筛选区域*/
+.otherfilter {
+  height: 36px;
+  color: white;
+  background-color: gray;
+  border-radius: 20px;
+  line-height: 36px;
+  text-align: left;
+}
+
+.otherfilter span,.otherfilter option,.otherfilter label{
+    font-size:12px;
+}
+
+.otherfilter .glyphicon:hover{
+    color:blue;
+}

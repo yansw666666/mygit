@@ -1,0 +1,542 @@
+{% extends 'layout/base_page.html' %}
+
+{% load static %}
+
+{% block title %}图片编辑{% endblock %}
+
+<!-- 引入font-awesome 的CSS文件 -->
+    <link rel="stylesheet" href="{% static 'plugin/font-awesome/css/font-awesome.min.css' %}">
+
+{% block css %}
+     <style>
+        .layui-form .layui-form-label {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .layui-form-select dl {
+            max-height: 160px;
+        }
+
+        .contentArea i:hover {
+            color: red;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <!--内容01：面包屑导航-->
+    <span class="layui-breadcrumb" >
+      <a href="" style="color: #0C0C0C">首页</a>
+      <a href="">图片资料</a>
+      <a style="color: #0C0C0C"><b>图片编辑</b></a>
+    </span>
+    <div class="layui-form-item">
+         <img src="{% static 'images/jmxt.jpg' %}" style="padding:20px 0 0 20px;width: 140px;height: 40px">
+    </div>
+     <!-- 内容02: 查询区域 --->
+    <div id="queryArea" style="margin-top: 20px">
+        <form class="layui-form" id="queryForm">
+            {% csrf_token %}
+            <div class="layui-form-item" >
+                <div class="layui-inline"  >
+                    <label class="layui-form-label" for="q_sta" ><b>站点名称：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="q_sta" id="q_sta" class="layui-input" style="float:left" >
+                    </div>
+                </div>
+                <div class="layui-inline" >
+                    <label class="layui-form-label" for="q_shb"><b>设备类型：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="q_shb" id="q_shb" class="layui-input" style="float:left">
+                    </div>
+                </div>
+                <div class="layui-inline" style="margin-right:0px;margin-left:0px  ">
+                    <label class="layui-form-label" for="q_shm"><b>图片说明：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="q_shm" id="q_shm" class="layui-input" >
+                    </div>
+                </div>
+                <div class="layui-inline" >
+                    <button type="button" id="btnQuery" class="layui-btn" >
+                        <i class="fa fa-search" aria-hidden="true"></i>&nbsp;查询
+                    </button>
+                    <button type="button" id="btnAll" class="layui-btn" >
+                        <i class="fa fa-bars" aria-hidden="true"></i>&nbsp;&nbsp;全部
+                    </button>
+                    <button type="button" class="layui-btn" id="btnUpload">
+                         <i class="layui-icon" aria-hidden="true" >&#xe67c;</i>上传
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- 内容03：图片内容区域 -->
+    <div style="display: flex;flex-direction: column">
+        <div class="contentArea"></div>
+        <div id="pageArea"></div>
+    </div>
+
+
+
+     <!--=======弹出层的内容=========-->
+    <div id="layerContent" style="display:none;padding:30px 10px 0 30px">
+        <form class="layui-form" id="layerForm" lay-filter="layerForm" style="margin-left:20px ">
+            {% csrf_token %}
+            <!-- 图片名称，所属站点，设备类型，说明，修改时间-->
+            <!-- 图片id -->
+            <div class="layui-form-item" style="display: none" >
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="image_name" style="background-color: #eaeaea"><b>图片id：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="image_id" id="image_id" placeholder="必填" class="layui-input" style="width: 250px">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 图片名称 -->
+            <div class="layui-form-item" >
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="image_name" style="background-color: #eaeaea"><b>图片名称：</b></label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="image_name" id="image_name" placeholder="必填" class="layui-input" style="width: 250px">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 图片说明 -->
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="image_des" style="background-color: #eaeaea"><b>图片说明：</b></label>
+                    <div class="layui-input-inline">
+                        <textarea name="image_des" id="image_des" required lay-verify="required"
+                                  placeholder='选填' class="layui-textarea" style="width: 250px"></textarea>
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 所属站点-->
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" for="station_region" style="background-color: #eaeaea"><b>所属站点：</b></label>
+                    <div class="layui-input-inline">
+                       <input type="text" name="image_station" id="image_station" placeholder="必填，请使用规范名称" class="layui-input" style="width: 250px">
+                        <span class="error_msg" style="color:red; position: absolute"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 设备类型 -->
+            <div class="layui-form-item">
+                  <label class="layui-form-label" for="station_type" style="background-color: #eaeaea"><b>设备类型：</b></label>
+                <div class="layui-input-inline">
+                    <div id="shebei_type" class="xm-select-demo" style="width: 250px"></div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+{% endblock %}
+{% block js %} <script src="{% static 'js/xm-select.js' %}"></script>
+    <script>
+        let TAG=1
+        $(function(){
+            initpage()
+            upload()
+            loadData()
+            buttonClick()
+        })
+
+
+
+        //页面的初始化
+        function initpage() {
+            layui.use(['element','form'],function () {
+                let element = layui.element;
+                let form = layui.form;
+
+            })
+        }
+
+        // ========== 实现文件的上传 =================
+        function upload() {
+            layui.use(['upload','layer'],function () {
+                let upload = layui.upload;
+                let layer=layui.layer
+                //执行实例
+                var uploadInst = upload.render({
+                    elem: '#btnUpload' //绑定元素
+                    ,url: '{% url 'upload_image' %}' //上传接口
+                    ,method:'post'
+                    ,data:{
+                        csrfmiddlewaretoken:'{{ csrf_token }}'
+                    }
+                    ,size:10240        // 上传文件最大的限制, 单位：kB
+                    ,auto:true        // 自动上传
+                    ,accept:'file'    // 可以支持所有的文件
+                    ,exts:'jpg|jpeg|png|gif'    // 上传文件可接受的后缀名
+                    //三个回调函数
+                    ,before: function (obj) {
+                        // === 选择文件在上传前的回调 ====
+                        layer.load(); //上传loading
+                        }
+                    ,done: function(res){
+                           // === 上传成功后的回调 ====
+                        layer.closeAll('loading'); //关闭loading
+                        // 根据返回值判断
+                        if (res.status) {
+                            layer.msg("照片上传完成！");
+                            location.reload()
+
+                        } else {
+                            layer.msg(res.error, {
+                                icon: 2,
+                                area: ['400px', '200px'],
+                                time: -1,
+                                btn: ['关闭']
+                            })
+                        }}
+                    ,error: function (index, upload) {
+                        // === 上传时前端出现问题 ====
+                        layer.closeAll('loading'); //关闭loading
+                    }
+                });
+            })
+        }
+
+         // ========== 获取图片并展示图片 =============
+        function loadData() {
+            // Ajax请求
+            $.ajax({
+                url: "{% url 'list_image' %}",
+                method: 'post',
+                data: {
+                    q_sta: $('#q_sta').val(),
+                    q_shm: $('#q_shm').val(),
+                    q_shb: $('#q_shb').val(),
+                    page: 1,
+                    limit: 18,
+                    status:TAG,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                dataType: 'json',
+                success: function (res) {
+                    // 加载数据
+                    <!--buildImagePage(res.data);-->
+                    loadDataPages(res)
+
+                }
+            })
+        }
+
+         // ======= 构建交接单的前段展示 ==========
+        function buildImagePage(data) {
+            let targetContainer=$('.contentArea')
+            targetContainer.empty()
+            $.each(data,function (name,value) {
+                    // 新建一个外层的集合
+                let waikuang = $('<div>').attr('class', 'layui-col-xs6 layui-col-sm6 layui-col-md2 layui-col-lg2').css('margin-bottom', '20px');
+                    // 新建一个子集集合
+                let zhongkuang = $('<div>').attr('style', 'width: 80%;height: 210px;background-color:lightblue;margin: auto;text-align: center;font-size:18px;').appendTo(waikuang);
+                    // 新建一个图片容器
+                let imgcontent = $('<img>').attr({
+                        'src': value.url,
+                        'alt': '图片',
+                        'title': value.remark,
+                        'style': "width: 100%;height: 190px;border: 1px #009688 solid;box-sizing:border-box; ",
+                        'onclick': 'previewImg(this)'
+                    }).appendTo(zhongkuang);
+                    // 附加底部的图片标注和编辑、删除的图标按钮
+                let bottomArea = $('<div>').attr({'style': 'width:100%; height:20px; background-color:#009688'}).appendTo(zhongkuang);
+                    $('<div>').html(value.image_remark).attr('style', 'float:left; color:white;font-size:14px; line-height:20px').appendTo(bottomArea);
+                    $('<i>').attr('id', 'btnEdit')
+                        .attr('remark', value.image_remark)
+                        .attr('des', value.image_des)
+                        .attr('code', value.id)
+                        .attr("date", value.creat_date)
+                        .attr('shebei', value.image_shebei_id)
+                        .attr('zhandian', value.image_station_id)
+                        .attr('style', 'color:white')
+                        .attr('class', 'fa fa-edit')
+                        .attr('aria-hidden', true).appendTo(bottomArea);
+                    $('<i>').attr('id', 'btnDel')
+                        .attr('code', value.id)
+                        .attr('remark', value.image_remark)
+                        .attr('style', 'color:orange;margin_right:10px;float:right')
+                        .attr('class', 'fa fa-trash')
+                        .attr('aria-hidden', true).appendTo(bottomArea);
+                    // 附加到
+                    waikuang.appendTo(targetContainer);
+        })
+        }
+
+        // ======= 弹出编辑框==========
+        function loadlayer(value='') {
+            layui.use(['layer','form'],function () {
+                let layer =  layui.layer;
+                let form = layui.form;
+
+                layer.open({
+                    type:1
+                    ,title:"<b style='color:brown'>【编辑图片信息】</b>"
+                    ,area:['500px','550px']
+                    ,btn:['确定','取消']
+                    ,resize:false
+                    ,content:$('#layerContent')
+
+                    // ======== 回调函数==========
+                    ,success:function(){
+                        //初始化角色的下拉框
+                        render_select()
+                        // 填充数据
+                        $('#image_id').val(value.id)
+                        $('#image_name').val(value.remark)
+                        $('#image_station').val(value.zhandian)
+                        $('#image_des').val(value.des)
+                        $.ajax({
+                            url:'{% url 'get_image_shebei' %}'
+                            ,method:'post'
+                            ,data:{
+                                id:value.shebei,
+                                csrfmiddlewaretoken:'{{ csrf.token }}'
+                            }
+                            ,success: function(res){
+                                 xmSelect.get('#shebei_type')[0].setValue([{'name':res.data.name,'value':res.data.value}])
+                            }
+                        })
+
+                    }
+                    ,yes:function(index,layero){
+                        let commitURL="{% url 'edit_image' %}";
+                        //============3、提交到后台
+                         $.ajax({
+                             url: commitURL
+                             , data: $('#layerForm').serialize()
+                             , dataType: 'json'
+                             , method: 'post'
+                             , success: function (res){
+                                 //0---成功，-1---账号已存在 -2---异常
+                                if (res.status){
+                                    layer.msg('操作成功！')
+                                    layer.close(index);
+                                    location.reload();
+                                }
+                                else {
+                                    layer.msg(res.error,{
+                                        icon:2,time:-1,area:['300px','150px'],btn:['关闭']
+                                    })
+                                }
+
+                             }
+                         })
+                    }
+                    ,end:function(){
+
+                    }
+                })
+            })
+        }
+
+        // ========== 按钮的点击事件 ================
+        function buttonClick() {
+            // === 查询====
+            $('#btnQuery').on('click', function () {
+                TAG=2
+                loadData();
+            });
+
+            // ==== 显示全部===
+            $('#btnAll').on('click', function () {
+                // === 清空查询条件===
+                $('#q_sta').val("");
+                $('#q_shm').val("");
+                $('#q_shb').val("");
+                loadData();
+            })
+
+
+            // ====== 图片信息编辑======
+            $('body').on('click', '#btnEdit',function () {
+                let id=$(this).attr('code')
+                let remark=$(this).attr('remark')
+                let des=$(this).attr('des')
+                let date=$(this).attr('date')
+                let zhandian=$(this).attr('zhandian')
+                let shebei=$(this).attr('shebei')
+                let data={'id':id,'remark':remark,'des':des,'shebei':shebei,'zhandian':zhandian}
+                loadlayer(data)
+            })
+
+            // ====== 删除图片======
+            $('body').on('click','#btnDel',function () {
+                let id=$(this).attr('code')
+                let title=$(this).attr('remark')
+                let confirmStr= '您是否确认删除图片信息【'+title+'】?'
+                layui.use(['layer'],function () {
+                    let layer=layui.layer
+                     layer.confirm(confirmStr, {icon: 3, title: "删除确认", area: ['400px', '200px']},
+                                function (index) {
+                     $.ajax({
+                            url:'{% url 'delete_image' %}'
+                            ,method:'post'
+                            ,data: {
+                                id:id,
+                                csrfmiddlewaretoken: '{{ csrf_token }}'
+                                    }
+                            ,success:function(res){
+                                if (res.status){
+                                    layer.msg('删除成功！')
+                                    layer.close(index)
+                                    loadData()
+                                }else{
+                                    layer.msg(res.error,{
+                                        icon:2,
+                                        area:['500px','200px'],
+                                        time:-1,
+                                        btn:['取消']
+                                    })
+                                }
+                            }
+                        })
+                                })
+                })
+            })
+            }
+
+        // ==============渲染下拉选择框 ==========
+        function render_select() {
+                // 初始化
+            let demo5 = xmSelect.render({
+                el: '#shebei_type',
+                filterable: true,
+                height: '500px',
+                tips:'选择设备类型',
+                paging: true,
+                radio:true,
+                pageSize:3,
+                data: [
+                        {name: '配线资料', children: [
+                            {name: '音频配线架', value: 1001},
+                            {name: '数字配线架', value: 1002},
+                            {name: '光纤配线架', value: 1003},
+                        ]},
+                        {name: '传输设备', children: [
+                            {name: '华为传输', value: 2001},
+                            {name: '中兴传输', value: 2002},
+                            {name: '烽火传输', value: 2003},
+                            {name: 'OTN传输', value: 2004},
+                        ]},
+                        {name: '电源系统', children: [
+                            {name: '交流分配屏', value: 3001},
+                            {name: '直流分配屏', value: 3002},
+                            {name: '高频开关电源', value: 3003},
+                            {name: '蓄电池组', value: 3004},
+                            {name: 'UPS电源', value: 3005},
+                        ]},
+                        {name: '终端设备', children: [
+                            {name: '视频终端', value: 4001},
+                            {name: '音频终端', value: 4002},
+                            {name: 'PCM终端', value: 4003},
+                            {name: 'IAD设备', value: 4004},
+                        ]},
+                        {name: '交换设备', children: [
+                            {name: '调度交换', value: 5001},
+                            {name: '行政交换', value: 5002},
+                            {name: '录音设备', value: 5003},
+                        ]},
+                        {name: '监控设备', children: [
+                            {name: '动环监控', value: 6001},
+                            {name: '网管设备', value: 6002},
+                        ]},
+                        {name: '空调系统', children: [
+                            {name: '工业空调', value: 7001},
+                            {name: '普通空调', value: 7002},
+                        ]},
+                    {name: '机房环境', children: [
+                            {name: '机柜状况', value: 8001},
+
+                        ]},
+                    ]
+                })
+            $.ajax({
+                url:'{% url 'get_all_shebei' %}'
+                ,method:'get'
+                ,success:function(res){
+                }
+            })
+            }
+
+        // =========== 使用分页展示数据==============
+        function loadDataPages(value) {
+            layui.use(['laypage'], function () {
+                let laypage = layui.laypage;
+
+                laypage.render({
+                    elem: 'pageArea'
+                    , count: value.count  // 当前数据的总量
+                    , page: 1
+                    , limit: 12
+                    , limits: [6, 12, 18, 24, 30, 36]
+                    , layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+                    , jump: function (obj) {
+
+
+                     $.ajax({
+                         url: "{% url 'list_image' %}",
+                         method: 'post',
+                         data: {
+                             q_sta: $('#q_sta').val(),
+                             q_shm: $('#q_shm').val(),
+                             q_shb: $('#q_shb').val(),
+                             page: obj.curr,
+                             limit: obj.limit,
+                             status:TAG,
+                             csrfmiddlewaretoken: "{{ csrf_token }}"
+                                },
+                            dataType: 'json',
+                            success: function (res) {
+                                 buildImagePage(res.data);
+                            }
+                        })
+                    }
+                });
+            })
+        }
+
+         // ======= 在弹出层显示图片 ========
+        function previewImg(obj) {
+            var img = new Image();
+            img.src = obj.src;
+
+            var height = img.naturalHeight + 50; // 原图片大小
+            var width = img.naturalWidth; //原图片大小
+            //var imgHtml = "<img src=" + obj.src + " style='width:" + width + ";height:" + height + "'/>";
+            var imgHtml = "<img src='"+obj.src+"' style='width: 1200px'>"
+            //弹出层
+            layer.open({
+                type: 1,
+                shade: 0.8,
+                offset: 'auto',
+                area: 'auto',
+                //area: [width.toString() + 'px', height.toString() + 'px'],// [500 + 'px',550+'px'],  //  //原图显示
+                maxWidth: '1200px',
+                maxHeight: '700px',
+                shadeClose: true,
+                scrollbar: true,
+                title: "<b style='color:navy'>*图片预览*</b>", //不显示标题
+                content: imgHtml, //捕获的元素，注意：最好该指定的元素要存放在body最外层，否则可能被其它的相对元素所影响
+                cancel: function () {
+                    //layer.msg('捕获就是从页面已经存在的元素上，包裹layer的结构', { time: 5000, icon: 6 });
+                }
+            });
+        }
+
+    </script>
+{% endblock %}
+
+
+
+
+
+
