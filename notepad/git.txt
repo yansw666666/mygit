@@ -21,3 +21,15 @@ cat readme打开一个文件
 添加远程仓库github
 代码托管
 github.com
+创建远程仓库
+设置远程仓库
+settings
+$ ssh-keygen -t rsa -C '610999652@qq.com'
+产生两个文件
+rsa
+rsa.pub
+复制公钥
+拷贝到SSH中
+git remote add origin git@github.com:yansw666666/aaa.git
+解决每次都要输密码
+git config --global credential.helper store
