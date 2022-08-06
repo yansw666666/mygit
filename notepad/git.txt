@@ -33,3 +33,4 @@ rsa.pub
 git remote add origin git@github.com:yansw666666/aaa.git
 解决每次都要输密码
 git config --global credential.helper store
+密码会长期保存
