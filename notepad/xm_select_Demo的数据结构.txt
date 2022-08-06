@@ -1,0 +1,42 @@
+[
+{'name':name,value:id},
+{'name':cooo,value:11111},
+{'name':cooo,value:11111},
+]
+
+
+<div class="layui-inline" style="width: 623px">
+                    <label class="layui-form-label" for="roles"><b>角色：</b></label>
+                    <div class="layui-input-block">
+                        <div id="roles" class="xm-select-demo"></div>
+                    </div>
+                </div>
+
+success:function(){
+                        //初始化角色的下拉框
+                        initrolesselect()
+}
+
+function initrolesselect() {
+            //初始化样子
+	 let roles_select = xmSelect.render({
+                el:'#roles'
+                ,name:'roles'
+                ,tips:'请选择所属的角色'
+                ,filterable:true
+                ,height:'200px'
+                ,data:[]
+            })
+
+            //初始化数据
+            $.ajax({
+                url:"{% url 'select_roles' %}"
+                ,method:'get'
+                ,success:function(res){
+                    //注意：是要赋值给data属性，不能直接赋值
+                    roles_select.update({data:res.data})
+                }
+
+            })
+
+        }

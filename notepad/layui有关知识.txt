@@ -1,0 +1,2 @@
+语法规范
+layer.msg(res.error,{ icon:2,time:-1,area:['500px','350px'],btn:['关闭'] })

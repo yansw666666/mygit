@@ -1,0 +1,70 @@
+﻿安装MySQL
+centos7是最小化版本
+1.查看系统有没有安装MySQL
+rpm -qa |grep mysql
+2.安装wget工具
+yum -y install wget
+3.使用wget下载mysql
+wget https://dev.mysql.com/get/mysql57-community-release-el7-10.noarch.rpm
+4.使用yum安装下载的mysql57在线安装工具
+yum -y install mysql57-community-release-el7-10.noarch.rpm获取所有包的列表
+yum -y install mysql-community-server真正的安装mysql
+如果安装有问题,需要进行升级
+rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
+5.查看mysql服务的情况
+1)查看服务状态 systemctl status mysqld.service
+2)启动服务     systemctl start mysqld
+reboot重启centos
+3)查看mysql服务是否自启动 systemctl enable mysqld
+4)查看mysql端口是否正常,正常运行的标准端口是3306
+  netstat -ntlp|grep mysql
+  或者使用lsof,先安装lsof 
+  yum install lsof
+  lsof -i: 3306
+5)登陆mysql
+mysql -u'root' -p'3?lXj+Qb./A8'
+但是mysql初始密码是多少呢?
+查看mysql的root帐号的初始密码
+/var/log/mysqld.log
+cat /var/log/mysqld.log
+grep "password" /var/log/mysqld.log
+必须更改密码
+ alter user 'root'@'localhost' identified by 'Aaa@1234'
+6)创建数据库
+ create database testdb;
+创建一个表
+use testdb
+mysql> create table student
+    -> (
+    -> sno int,
+    -> name varchar(20)
+    -> );
+mysql> insert into student values(95001,'alice');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into student values(95002,'bob');
+Query OK, 1 row affected (0.00 sec)
+mysql> select * from student;
+mysql> update student set name='thmos' where sno=95002;
+mysql> delete from student where sno=95002;
+mysql> show databases;
+ mysql> show tables;
+想要存中文,必须进行设置
+create database testdb01 default character set utf8 collate utf8_general_ci
+
+查看数据库当前的编码:
+mysql> show variables like 'character_set_database';
+mysql> alter database testdb characterset utf8;(修改数据库的编码格式)
+mysql> show create table student;(查看当前已存在的对象编码)
+mysql> alter table student set utf8;(修改表的编码格式)
+mysql> alter table student change name name varchar(20) character set utf8;(修改字段的编码格式)
+
+查看防火墙状态,关闭防火墙
+[root@localhost ~]# systemctl disable firewalld.service
+[root@localhost ~]# systemctl stop firewalld.service
+[root@localhost ~]# systemctl is-enabled firewalld.service
+关闭防火墙后还是不让连接,原因是root帐号只能本地连接,不允许远程连接
+use mysql
+show tables
+select user, host, select_priv from user
+mysql> update user set host='%' where user='root'

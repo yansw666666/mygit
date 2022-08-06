@@ -1,0 +1,19 @@
+什么叫版本控制？
+每一次更改与回退
+创建仓库
+git config  --global  user.name 'yansw'
+git config  --global  user.email  '610999652@qq.com'
+git init name
+git config --list
+git add .
+git commit -m 'zhushi'
+git push origin master
+版本控制
+git diff filename
+git log显示当前所有版本
+git reset --hard HEAD^
+git reset --hard HEAD^^
+git reset --hard HEAD~50
+git reset --hard 版本号
+git reflog记录了先前所有的版本号
+cat readme打开一个文件

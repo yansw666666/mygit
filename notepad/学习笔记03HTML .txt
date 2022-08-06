@@ -1,0 +1,45 @@
+#views.py
+from django.shortcuts import render
+from django.http import HttpResponse
+def index(request):
+    return HttpResponse('优酷首页!')
+def movie(request):
+    return HttpResponse('优酷电影页面!')
+def yl(request):
+    return HttpResponse('优酷娱乐页面!')
+
+#urls.py
+from django.contrib import admin
+from django.urls import path
+from app01 import  views
+urlpatterns = [
+    path('admin/', admin.site.urls), #默认的后台，有特殊的用途
+    path('',views.index),
+    path('movie/',views.movie),
+    path('yl/',views.yl),
+
+#如果选用app01的views则采取下面的方法
+from app01 import views as app01views
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('',app01views.index),
+因为不同的app01,app02下面都有自己的views
+
+#创建一个APP
+python manage.py startapp app01
+#怎么把8000端口改成80端口呢？从编辑器里修改
+127.0.0.1只能在本机访问，如果要外部访问，必须用自己真正的IP地址
+比如192.168.56.1
+因此，必须在settings.py里面的ALLOWED_HOSTS = ['192.168.56.1','www.youku.com']
+这样别人就可以通过访问这个地址来浏览自己开发的网页
+#能不能做成主机名的方式呢？www.youku.com
+windows--system32-drivers-etc-hosts
+协商192.168.56.1 www.youku.com
+
+#使用URL传值
+https://www.jianshu.com/p/d3ea16--------这篇文章的ID号
+传递的这个值就是文章的ID号
+ path('movie/<movie_id>/',app01views.movie_detail)
+变量传递时，变量名要一模一样
+def movie_detail(request,movie_id):
+    return HttpResponse('正在播放编号为：%s电影'%movie_id)

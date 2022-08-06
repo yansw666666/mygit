@@ -1,0 +1,40 @@
+一、Navicat创建新的数据库
+1、创建数据库
+             字符集utf8
+            排序规则utf8-unicode-ci
+2、连接数据库
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql', # 配置数据库的引擎
+        'NAME': 'jmxt',  # 数据库名称
+        'USER': 'root',  # 连接数据库的用户名
+        'PASSWRD': 'Aaaa.com',  # 连接数据库的密码
+        'HOST': 'localhost',  # 连接数据库的主机名/IP地址
+        'PORT': '3306',  # 连接数据库所使用的端口号
+
+    }
+}
+
+3、创建类
+class Peixian(models.Model):
+    编号 = models.IntegerField(null=False, primary_key=True)
+    站名名称 = models.CharField(max_length=20)
+    设备侧配线模块编号 = models.CharField(max_length=20)
+    设备侧配线模块位置 = models.CharField(max_length=20)
+    外线侧配线模块编号 = models.CharField(max_length=20)
+    外线侧配线模块位置 = models.CharField(max_length=20)
+    录音板配线模块编号 = models.CharField(max_length=20)
+    录音板配线模块位置 = models.CharField(max_length=20)
+    纽曼录音配线模块编号 = models.CharField(max_length=20)
+    纽曼录音配线模块位置 = models.CharField(max_length=20)
+    飞跃录音配线模块编号 = models.CharField(max_length=20)
+    飞跃录音线模块位置 = models.CharField(max_length=20)
+    备注 = models.CharField(max_length=100)
+
+4、加载mysql
+_init_py里面导入模块
+import pymysql
+pymysql.install_as_MySQLdb()
+
+5、创建映射关系

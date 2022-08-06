@@ -1,0 +1,21 @@
+1、name 'os' is not defined
+settings里面import os
+打开本地数据库
+services.msc
+查看mysql服务器是否开启
+2、navicat解压密码
+www.downcc.com
+3、char 与varchar的区别
+char 固定长度，最大255
+varchar，可变长度，最大65535
+
+python manage.py inspectdb
+根据表生成对应的类
+同步到APP里，怎么同步呢，移动到APP里覆盖
+把managed设置为True,默认情况下就做了关联
+然后用常规的makemigrations   migrate去跑一遍
+
+'utf-8' codec can't decode byte 0xb5 in position 2: invalid start byte
+莫非不用能中文字段？
+
+1、电子表格数据行要取消合并

@@ -1,0 +1,209 @@
+import pandas as pd
+from docx import Document
+import re                                                                                  #正则表达式
+from docx.enum.style import WD_STYLE_TYPE                      #关于字体的参数
+from docx.shared import Cm，Pt                                           #关于高度的参数
+from docx.shared import Pt,RGBColor                                   #关于字体颜色，字体
+from docx.enum.text import WD_ALIGN_PARAGRAPH        #设置段落对象在文件居中，对齐等
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT#设置对象在段落居中，对齐等
+from docx.enum.text import WD_TAB_ALIGNMENT,WD_TAB_LEADER#设置制表符等
+from docx.enum.text import WD_LINE_SPACING                 #行间距
+from docx.shared import Pt                                                   #设置像素、缩进等
+from docx.shared import Length                                           #设置宽度的库
+from docx.oxml.ns import qn                                                #设置中文字体的库
+from docx.enum.section import WD_SECTION_START        #设置页面分隔符
+#WD_SECTION_START.CONTINOUS连续分隔符
+#WD_SECTION_START.NEW_COLUMN新列分隔符
+#WD_SECTION_START.NEW_PAGE新页分隔符
+#WD_SECTION_START.EVEN_PAGE偶数页分隔符
+#WD_SECTION_START.ODD_PAGE奇数页分隔符
+#-----------------------------------------------------------
+doc1=Document('d:/wenben1.docx')
+duanluo=doc1.paragraphs
+#-----------------------------------------------------------
+#查看指定段落的文档内容
+# for i in range(10):
+#     print(duanluo[i].text+'(',end='')#查看每段段落的内容
+#     print(duanluo[i].style.name+')')#查看段落风格，段落风格有：标题（Heading 1,Heading 1......），正文格式。
+#-----------------------------------------------------------
+#查看属于某类标题的文档段落
+# for i in range(136):
+#     if duanluo[i].style.name=='Heading 1':#或者'正文格式'
+#         print(duanluo[i].text)
+#-----------------------------------------------------------
+#选择所有标题的文档段落，使用正则表达式
+# for i in range(136):
+#     if re.match('^Heading \d+$',duanluo[i].style.name):
+#         print(duanluo[i].text)
+#-----------------------------------------------------------
+#读取文件的标题风格
+风格=doc1.styles
+# for i in 风格:
+#     if i.type==WD_STYLE_TYPE.PARAGRAPH:
+#         print(i.name)
+#增加风格样式、正文，分页符
+doc1.add_heading('我是一级标题严少文',level=1)
+doc1.add_paragraph('我是正文严少文')
+doc1.add_page_break()
+#-----------------------------------------------------------
+#新增某一段，对段内文字进行分块编辑
+duanluo1=doc1.add_paragraph('')
+duanluo1.add_run('学号Word').bold=True
+duanluo1.add_run('很重要').italic=True
+#段落定位
+print(len(doc1.paragraphs))#显示段落数
+#-----------------------------------------------------------
+#插入某一段落
+duoluo2=doc1.paragraphs[5].insert_paragraph_before('123455')
+duoluo2.add_run('向公司党委负责并报告工作。').bold=True
+#-----------------------------------------------------------
+#在文件最后插入插入图片
+doc1.add_picture('d:/1.jpg',width=Cm(13),height=Cm(8))#在文件最后插入，插入时候可以加入参数
+#-----------------------------------------------------------
+#将图片添加到插入的段落
+duanluo3=doc1.paragraphs[6].insert_paragraph_before()
+图片块=duanluo3.add_run()
+图片块.add_picture('d:/1.jpg',width=Cm(13),height=Cm(8))
+#-----------------------------------------------------------
+#将图片添加到指定的段落
+图片块=doc1.paragraphs[10].add_run()
+图片块.add_picture('d:/1.jpg',width=Cm(13),height=Cm(8))
+#-----------------------------------------------------------
+#将图片添加到指定的表格单元
+单元格=doc1.tables[0].cell(0,0).paragraphs[0].add_run()#单元格里也分段落和块,表格在块里加
+单元格.add_picture('d:/1.jpg',width=Cm(13),height=Cm(8))
+#-----------------------------------------------------------
+#按照比例设置图片
+图片1=doc1.paragraphs[1].add_run().add_picture('d:/1.jpg',width=Cm(13),height=Cm(8))#在文档第2个段落里添加图片
+图片2=doc1.paragraphs[4].insert_paragraph_before().add_run().add_picture('d:/2.jpg')#在文档第3个段落里添加图片
+print('原始图像和当前图像的高度，',doc1.inline_shapes[0].height,doc1.inline_shapes[1].height)#打印原始图片大小
+print('当前图像和原始图像的高度比值',doc1.inline_shapes[1].height/doc1.inline_shapes[0].height)#打印当前图片高度比例
+# print('当前图像和原始图像的宽度比值',文件.inline_shapes[1].width/文件.inline_shapes[0].width)
+#打印当前图片宽度比例
+图片2.width=int(doc1.inline_shapes[0].width*0.7861635220125787)#按照比例设置图片宽度
+图片2.height=int(doc1.inline_shapes[0].height*0.707808564231738)#按照比例设置图片高度
+print('图片对象的数量：',len(doc1.inline_shapes))
+#图片是一种对象，图片定位用inline_shapes[i],增加图片add_picture
+#-----------------------------------------------------------
+#段落对齐
+# WD_PARAGRAPH_ALIGNMENT.LEFT
+# WD_PARAGRAPH_ALIGNMENT.RIGHT
+# WD_PARAGRAPH_ALIGNMENT.CENTER
+# WD_PARAGRAPH_ALIGNMENT.JUSTIFY#两侧对齐
+# WD_PARAGRAPH_ALIGNMENT.DISTRIBUTE#分散对齐
+doc1.paragraphs[4].alignment=WD_PARAGRAPH_ALIGNMENT.CENTER
+#-----------------------------------------------------------
+#插入表格
+表格=doc1.add_table(rows=4,cols=4)
+#-----------------------------------------------------------
+#表格填入内容,两种方法，一种是表格单元格赋值
+表格.cell(0,8).text='大家好'
+#单元格段落赋值
+表格.cell(0,0).paragraphs[0].text='中华人民共和国'
+段落=表格.cell(0,0).add_paragraph('第二个段落居中')
+段落.alignment=WD_PARAGRAPH_ALIGNMENT.CENTER
+#-----------------------------------------------------------
+#按行录入
+for i in range(3):
+    for j in range(3):
+        表格.cell(i,j).text=str(df1.iloc[i,j])
+#-----------------------------------------------------------
+#表格对齐
+表格=doc1.tables[19]
+表格.alignment=WD_PARAGRAPH_ALIGNMENT.JUSTIFY
+
+# for 列 in 表格.columns:
+#     for 单元格 in 列.cells:
+#         单元格.width=Cm(1)
+#-----------------------------------------------------------
+#表格样式
+# for 行 in 表格.rows:
+#     for 单元格 in 行.cells:
+#         for 段落 in 单元格.paragraphs:
+#             for 块 in 段落.runs:
+#                 块.font.name='Arail'#设置英文字体
+#                 块.element.rPr.rFonts.set('w:eastAsia','微软雅黑')#设置中文字体，
+
+#生成所有表样式
+文件=Document('d:/doc2.docx')
+# 所有样式=文件.styles
+# for 样式 in 所有样式:
+#     if  样式.type==WD_STYLE_TYPE.TABLE:
+#         文件.add_paragraph("表格样式："+样式.name)
+# 表=文件.add_table(3,3,style='Light List Accent 2')#样式名称
+# 单元格=表.rows[0].cells
+# 单元格[2].text='第三列内容'
+# 单元格[1].text='第二列内容'
+# 单元格[0].text='第一列内容'
+# 文件.add_paragraph("\n")
+#-----------------------------------------------------------
+#查找某段话在哪个段落,并对这段话修改颜色
+for i in range(len(doc1.paragraphs)):
+    if '公司党委' in doc1.paragraphs[i].text:
+        for 块 in doc1.paragraphs[i].runs:
+            块.font.bold=True#设置粗体
+            块.font.italic = True#设置斜体
+            # 块.font.underline = True  # 设置下划线
+            # 块.font.strike = True  # 设置删除线
+            # 块.font.shadow = True  # 设置阴影
+            # 块.font.size = Pt(24)  # 24磅字体
+            # 块.font.color.rgb =RGBColor(255,0,0)  # 颜色
+            # 块.font.name = 'Arial'  # 英文字体
+            #块._element.rPr.rFonts.set(qn('w:eastAsia'),'微软雅黑')#中文字体
+#设置正文字体
+doc1.styles['正文格式'].font.name='Arial'
+#-----------------------------------------------------------
+#段落对齐
+for  段落 in doc1.paragraphs:
+    if 段落.style.name=='正文格式':
+        段落.alignment=WD_ALIGN_PARAGRAPH.CENTER
+        段落=doc1.paragraphs[5]
+        段落.paragraph_format.line_spacing=5
+        段落.paragraph_format.line_spacing=WD_LINE_SPACING.ONE_POINT_FIVE#1.5倍
+        段落.paragraph_format.line_spacing=WD_LINE_SPACING.EXACTLY#固定值，50
+        段落.paragraph_format.line_spacing=Pt(50)
+    段落.paragraph_format.space_before = Pt(18)  # 段前
+    段落.paragraph_format.space_after = Pt(12)  # 段后
+    #-----------------------------------------------------------
+#缩进值，段前段后
+段落=doc1.paragraphs[4]
+段落.paragraph_format.left_indent = Pt(12)#左缩进
+段落.paragraph_format.first_line_indent = Pt(12)#左缩进,负数为悬挂缩进
+#-----------------------------------------------------------
+#节的设置
+文件=Document()
+print('默认的节数量',len(文件.sections))#打印默认节对数量
+print('默认段落的数量',len(文件.paragraphs))#打印默认段落数量
+文件.add_section()
+print('默认的节数量',len(文件.sections))#打印默认节对数量
+print('默认段落的数量',len(文件.paragraphs))#打印默认段落数量
+文件.add_section()
+print('默认的节数量',len(文件.sections))#打印默认节对数量
+print('默认段落的数量',len(文件.paragraphs))#打印默认段落数量
+页眉=文件.sections[0].header
+段落=页眉.paragraphs[0].add_run('这是第一个节的页眉')
+页脚=文件.sections[0].footer
+段落=页脚.paragraphs[0].add_run('这是第一个节的页脚')
+页眉=文件.sections[1].header
+页眉.is_linked_to_previous=False#独立设置时必须加这条命令
+段落=页眉.paragraphs[0].add_run('这是第2个节的页眉')
+段落=页眉.paragraphs[0].alignment=WD_ALIGN_PARAGRAPH.CENTER
+#页眉页脚到顶端的距离
+文件.sections[1].header_distance=Cm(5)
+文件.sections[1].footer_distance=Cm(5)
+#奇偶页的页眉页脚设置
+文件.settings.odd_and_even_pages_header_footer=True
+第一节=文件.sections[0]
+偶数页=第一节.even_page_header
+页眉=偶数页.paragraphs[0].add_run('这是偶数页的页眉')
+#首页不同
+第一个节=文件.sections[0]
+第一个节.different_first_page_header_footer=True
+首页对象=第一个节.first_page_header
+页眉=首页对象.paragraphs[0].add_run('这是首页')
+页眉.font.size=Pt(18)
+文件.save('d:/doc3.docx')
+#
+#-----------------------------------------------------------
+doc1.save('d:/doc1.docx')
+文件.save('d:/doc2.docx')

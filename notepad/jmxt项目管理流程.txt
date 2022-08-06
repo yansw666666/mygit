@@ -1,0 +1,8 @@
+一、安装MySQL-window10
+二、安装Navicat
+三、安装pycharm,搭建新项目jmxt
+四、创建应用程序ddjh
+
+name 'os' is not defined      在settings中 mport os
+五、登录模块功能
+

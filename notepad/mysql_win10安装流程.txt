@@ -1,0 +1,12 @@
+一、下载mysql
+1、在浏览器打开http://www.mysql.com
+2、进入顶部的DOWNLOADS
+3、打开页面底部的“MySQL Community (GPL) Downloads »”
+4、MySQL Installer for Windows
+5、Windows (x86, 32-bit), MSI Installer	8.0.29	439.6M	
+6、No thanks, just start my download.
+
+二、安装mysql
+双击下载好的mysql-installer-community-8.0.29.0.msi
+mysql server 
+password:Aaaa.com

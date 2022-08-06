@@ -1,0 +1,137 @@
+一、.restful的接口规范
+1、后台是一个接口，可以用域名
+http://api.abc.com/
+http://abc.com/api/
+
+2、rest frame的版本
+http://abc.com/api/v1/
+http://abc.com/api/v2/
+
+3、路径
+http://abc.com/api/v1/accounts/
+http://abc.com/api/v2/roles/
+http://abc.com/api/v2/permissions/
+http://abc.com/api/v1/stations/
+
+4、请求方法
+==================传统=========
+获取所有对象---->list values()---GET------>url :http://127.0.0.1/stations/
+添加对象---->add values()----POST-----url :http://127.0.0.1/stations/add/
+修改对象---->edit values()---POST------url :http://127.0.0.1/stations/edit/
+删除对象---->edit values()---POST------url :http://127.0.0.1/stations/del/
+获取某一个对象---->get  values()---POST------url :http://127.0.0.1/stations/
+
+==================restful=========
+获取所有对象
+GET------>url :http://127.0.0.1/api/v1/stations/
+添加对象
+POST---------->url :http://127.0.0.1/api/v1/stations/
+修改对象全部属性
+PUT----->-url :http://127.0.0.1/api/v1/stations/95001/
+修改对象部分属性
+PATCH----->-url :http://127.0.0.1/api/v1/stations/95001/
+删除对象
+DELETE------>url :Vstations/95001/
+获取某一个对象
+GET------url :http://127.0.0.1/api/v1/stations/95001/
+
+过滤属性
+http://127.0.0.1/stations/？name='220Kv南桥站'
+http://127.0.0.1/stations/？name='220Kv南桥站'&id=1234
+查找属性
+http://127.0.0.1/stations/？search=1234
+排序属性
+http://127.0.0.1/stations/？ordering=name
+http://127.0.0.1/stations/？ordering=-name，number
+分页属性
+http://127.0.0.1/stations/？page=4
+http://127.0.0.1/stations/？page=4&size=15
+
+restful安装和实现
+1、安装包
+pip install djangorestframework
+安装后一定要在settings 里的APP进行注册
+2、序列化：负责对象和json格式的相互转换
+3、视图：实现后台功能的核心。早期的视图是给予函数的---FBV,DRF的视图基于类----CBV
+4、路由:
+
+vscode:安装包
+HTML CSS Support
+open in browser
+Live server
+auto rename tag
+Chinese language pack
+vue language features
+element ui snippets
+
+node_module记录了项目运行的依赖包，主要是运行环境所依赖的文件
+public 存放一些公共的文件，通过完整路径区访问的
+assets也是存放静态文件的，固定不变的图放public，可编辑的放access
+components组件，存放所写的源码
+app.vue所有的接口文件
+index.html主页面，自动执行的脚本文件
+.gitignore同步到公网时，只同步源码
+
+ "scripts": {
+    "dev": "vite",                                                                 npm run dev
+    "build": "vue-tsc --noEmit && vite build",                 跟Vue相关的东西打包成传统的前端的文件，打包后悔多一个目录
+    "preview": "vite preview"                                             preview预览发布
+  },
+  "dependencies": {
+    "vue": "^3.2.37"	                                                      生产环境中的依赖     												
+  },
+  "devDependencies": {			  开发环境中的依赖  ，是装入生产环境还是开发环境，每个包都有自己的定义
+    "@vitejs/plugin-vue": "^3.0.0",
+    "typescript": "^4.6.4",
+    "vite": "^3.0.0",
+    "vue-tsc": "^0.38.4"
+  }
+
+npm install vuex --save
+npm i vuex -S
+两种命令都是一样的
+
+vue3里面，页面是如何加载的
+重点理解三个文件
+index.html
+main.ts
+app.vue
+
+<div id="app"></div>
+
+  <HelloWorld msg="Vite + Vue" />
+组件化
+
+
+install element-plus
+自动加入生产环境的依赖
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

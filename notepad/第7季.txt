@@ -1,0 +1,23 @@
+一、用户登录模块
+注册用户-->写入账号到数据库
+登录-->身份验证，cookie，session
+注销  -->清除cookie，session
+找回密码  -->手机  邮箱
+账号的启用，禁用，修改密码
+
+cookie、session 短信  邮件  中间件  密码的加密存储
+
+二、项目代码的优化
+1、优化目录结构
+     apps
+            --resources_base基础资源目录
+                                         --module_base存储基础的python操作类
+                                         --templates_base
+                                                   --layout存储templates模板
+
+            --static静态文件目录
+                                         --CSS样式文件
+                                         --images图片
+                                         --JS文件
+                                         --plugin插件
+            --apps项目中的APP

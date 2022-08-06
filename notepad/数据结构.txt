@@ -1,0 +1,28 @@
+1、models.Account.objects.all().values()
+
+<QuerySet [
+{'loginid': '1001',
+ 'loginpwd': '50567b4ee38a72113f9f094160a76c76', 
+'name': '陈晓东',
+ 'status': True, 
+'department': '信息部',
+ 'position': '网络工程师', 
+'mobile': '13912345678', 
+'email': 'chengxiaodong@abc.com',
+ 'last_login': datetime.datetime(2022, 3, 8, 4, 45, 37, 
+tzinfo=<UTC>), 'create_time': datetime.datetime(2021, 8, 12, 10, 37, 29, tzinfo=<UTC>),
+ 'edit_time': datetime.datetime(2022, 3, 8, 1, 40, 56, tzinfo=<UTC>)}, 
+
+{'loginid': '1002',
+ 'loginpwd': '925b3909b2b56a523300c685a68c593f', 
+'name': '王小进',
+ 'status': True, 
+'department': '销售部',
+ 'position': '主管',
+ 'mobile': '13482038888', 
+'email': '13482034096@163.com',
+ 'last_login': datetime.datetime(2021, 10, 16, 12,
+0, 34, tzinfo=<UTC>), 
+'create_time': datetime.datetime(2021, 6, 20, 13, 0, 18, tzinfo=<UTC>), 
+'edit_time': datetime.datetime(2022, 2, 21, 15, 57, 9, tzinfo=<UTC>)}
+]

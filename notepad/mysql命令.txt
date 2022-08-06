@@ -1,0 +1,6 @@
+1、查看MySQL的安装目录
+mysql>select @@basedir
+ C:\Program Files\MySQL\MySQL Server 8.0\
+1、查看MySQL的数据目录
+mysql>select @@datadir
+C:\ProgramData\MySQL\MySQL Server 8.0\Data\

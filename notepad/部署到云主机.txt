@@ -1,0 +1,17 @@
+
+(TeleMgrPhoto) D:\信息通信技术\django学习\django项目\TeleMGR_YUN>
+
+1、关闭debug模式
+DEBUG = False
+2、放行所有主机
+ALLOWED_HOSTS = ['*', ]
+3、把所依赖的包导出成文本文件
+pip freeze >requirements.txt
+读取时：
+pip install - r  requirements.txt
+
+4、本地源码发布到Gitee
+三个区：工作区，暂存区，本地仓库
+安装GITEE软件
+centos.org
+
